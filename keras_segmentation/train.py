@@ -71,7 +71,7 @@ def train(model,
           optimizer_name='adam',
           do_augment=False,
           augmentation_name="aug_all",
-          class_weight=None):
+          loss_function=None):
 
     from .models.all_models import model_from_name
     # check if user gives model name instead of the model object
@@ -96,7 +96,9 @@ def train(model,
 
     if optimizer_name is not None:
 
-        if ignore_zero_class:
+        if loss_function is not None:
+            loss_k = loss_function
+        elif ignore_zero_class:
             loss_k = masked_categorical_crossentropy
         else:
             loss_k = 'categorical_crossentropy'
@@ -156,12 +158,11 @@ def train(model,
 
     if not validate:
         model.fit_generator(train_gen, steps_per_epoch,
-                            epochs=epochs, callbacks=callbacks, class_weight=class_weight)
+                            epochs=epochs, callbacks=callbacks)
     else:
         model.fit_generator(train_gen,
                             steps_per_epoch,
                             validation_data=val_gen,
                             validation_steps=val_steps_per_epoch,
                             epochs=epochs, callbacks=callbacks,
-                            use_multiprocessing=gen_use_multiprocessing,
-                            class_weight=class_weight)
+                            use_multiprocessing=gen_use_multiprocessing)
