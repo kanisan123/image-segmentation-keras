@@ -128,7 +128,9 @@ def visualize_segmentation(seg_arr, inp_img=None, n_classes=None,
 def predict(model=None, inp=None, out_fname=None,
             checkpoints_path=None, overlay_img=False,
             class_names=None, show_legends=False, colors=class_colors,
-            prediction_width=None, prediction_height=None):
+            prediction_width=None, prediction_height=None, threshold=0.5):
+
+    def 
 
     if model is None and (checkpoints_path is not None):
         model = model_from_checkpoint_path(checkpoints_path)
@@ -151,7 +153,12 @@ def predict(model=None, inp=None, out_fname=None,
     x = get_image_array(inp, input_width, input_height,
                         ordering=IMAGE_ORDERING)
     pr = model.predict(np.array([x]))[0]
-    pr = pr.reshape((output_height,  output_width, n_classes)).argmax(axis=2)
+    pr = pr.reshape((output_height,  output_width, n_classes))
+
+    if n_classes == 2:
+        pr = np.vectrize(lambda s: 0 if s >= threshold else 1 )(pr[:,:,0])
+    else:
+        pr = pr.argmax(axis=2)
 
     seg_img = visualize_segmentation(pr, inp, n_classes=n_classes,
                                      colors=colors, overlay_img=overlay_img,
@@ -255,7 +262,7 @@ def predict_video(model=None, inp=None, output=None,
 
 
 def evaluate(model=None, inp_images=None, annotations=None,
-             inp_images_dir=None, annotations_dir=None, checkpoints_path=None):
+             inp_images_dir=None, annotations_dir=None, checkpoints_path=None, threshold=0.5):
 
     if model is None:
         assert (checkpoints_path is not None),\
@@ -282,7 +289,7 @@ def evaluate(model=None, inp_images=None, annotations=None,
     n_pixels = np.zeros(model.n_classes)
 
     for inp, ann in tqdm(zip(inp_images, annotations)):
-        pr = predict(model, inp)
+        pr = predict(model, inp, threshold=threshold)
         gt = get_segmentation_array(ann, model.n_classes,
                                     model.output_width, model.output_height,
                                     no_reshape=True)
