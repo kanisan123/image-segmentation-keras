@@ -154,7 +154,7 @@ def predict(model=None, inp=None, out_fname=None,
     pr = pr.reshape((output_height,  output_width, n_classes))
 
     if n_classes == 2:
-        pr = np.vectrize(lambda s: 0 if s >= threshold else 1 )(pr[:,:,0])
+        pr = np.vectorize(lambda s: 0 if s >= threshold else 1 )(pr[:,:,0])
     else:
         pr = pr.argmax(axis=2)
 
