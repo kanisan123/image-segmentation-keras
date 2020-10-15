@@ -130,8 +130,6 @@ def predict(model=None, inp=None, out_fname=None,
             class_names=None, show_legends=False, colors=class_colors,
             prediction_width=None, prediction_height=None, threshold=0.5):
 
-    def 
-
     if model is None and (checkpoints_path is not None):
         model = model_from_checkpoint_path(checkpoints_path)
 
